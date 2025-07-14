@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-7 col-lg-6">
+        <div class="card p-4 shadow-lg">
+            <h2 class="mb-4 text-primary"><i class="bi bi-plus-circle"></i> Nouveau ticket</h2>
+            {% if form.errors %}
+                <div class="alert alert-danger">Veuillez corriger les erreurs ci-dessous.</div>
+            {% endif %}
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_titre" class="form-label">Titre</label>
+                    <input type="text" name="titre" required class="form-control" id="id_titre" placeholder="Sujet du ticket" value="{{ form.titre.value|default:'' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="id_description" class="form-label">Description</label>
+                    <textarea name="description" required class="form-control" id="id_description" rows="4" placeholder="Décrivez le problème">{{ form.description.value|default:'' }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="id_urgence" class="form-label">Urgence</label>
+                    {{ form.urgence }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_piece_jointe" class="form-label">Pièce jointe</label>
+                    <input type="file" name="piece_jointe" class="form-control" id="id_piece_jointe">
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Créer le ticket</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

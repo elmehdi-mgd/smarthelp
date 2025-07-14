@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h3 class="card-title text-primary">{{ ticket.titre }}</h3>
+                <p class="card-text">{{ ticket.description }}</p>
+                <p class="mb-1"><strong>Statut :</strong> <span class="badge bg-secondary">{{ ticket.get_statut_display }}</span></p>
+                <p class="mb-1"><strong>Urgence :</strong> 
+                {% if ticket.urgence == 'haute' %}
+                    <span class="badge bg-danger">{{ ticket.get_urgence_display }}</span>
+                {% elif ticket.urgence == 'moyenne' %}
+                    <span class="badge bg-warning text-dark">{{ ticket.get_urgence_display }}</span>
+                {% else %}
+                    <span class="badge bg-success">{{ ticket.get_urgence_display }}</span>
+                {% endif %}
+                </p>
+                <p class="mb-1"><strong>Auteur :</strong> {{ ticket.auteur }}</p>
+                <p class="mb-1"><strong>Assigné à :</strong> {{ ticket.technicien_assigne|default:'Non assigné' }}</p>
+                <p class="mb-1"><strong>Date de création :</strong> {{ ticket.date_creation|date:"d/m/Y H:i" }}</p>
+                {% if ticket.piece_jointe %}
+                <p class="mb-1"><strong>Pièce jointe :</strong> <a href="{{ ticket.piece_jointe.url }}" target="_blank">Télécharger</a></p>
+                {% endif %}
+                {% if can_edit %}
+                <a href="/tickets/{{ ticket.id }}/edit/" class="btn btn-outline-primary btn-sm mt-2"><i class="bi bi-pencil"></i> Modifier</a>
+                {% endif %}
+                {% if can_delete %}
+                <a href="/tickets/{{ ticket.id }}/delete/" class="btn btn-outline-danger btn-sm mt-2"><i class="bi bi-trash"></i> Supprimer</a>
+                {% endif %}
+                {% if is_admin %}
+                <form method="post" class="mb-3">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <select name="assign_technicien" class="form-select" required>
+                            <option value="">Assigner un technicien</option>
+                            {% for tech in techniciens %}
+                            <option value="{{ tech.id }}" {% if ticket.technicien_assigne and ticket.technicien_assigne.id == tech.id %}selected{% endif %}>{{ tech.username }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" name="action" value="assign" class="btn btn-primary">Assigner</button>
+                    </div>
+                </form>
+                {% endif %}
+                {% if is_technicien %}
+                <form method="post" class="mb-3">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <select name="statut" class="form-select" required>
+                            {% for value, label in ticket.STATUT_CHOICES %}
+                            <option value="{{ value }}" {% if ticket.statut == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" name="action" value="statut" class="btn btn-success">Changer le statut</button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title text-success"><i class="bi bi-chat-dots"></i> Commentaires</h5>
+                {% for commentaire in commentaires %}
+                <div class="mb-3 border-bottom pb-2">
+                    <div class="d-flex align-items-center mb-1">
+                        <i class="bi bi-person-circle me-2"></i>
+                        <strong>{{ commentaire.auteur }}</strong>
+                        <span class="text-muted small ms-2">{{ commentaire.date|date:"d/m/Y H:i" }}</span>
+                    </div>
+                    <div>{{ commentaire.texte }}</div>
+                </div>
+                {% empty %}
+                <div class="alert alert-info">Aucun commentaire pour ce ticket.</div>
+                {% endfor %}
+                <form method="post" class="mt-3">
+                    {% csrf_token %}
+                    <div class="mb-2">
+                        <textarea name="texte" class="form-control" rows="2" placeholder="Ajouter un commentaire..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-sm">Ajouter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title text-info"><i class="bi bi-clock-history"></i> Historique</h5>
+                {% for h in historique %}
+                <div class="mb-2">
+                    <span class="small text-muted">{{ h.date|date:"d/m/Y H:i" }}</span><br>
+                    <span>{{ h.action }}</span>
+                    <span class="text-muted small">par {{ h.auteur|default:'Système' }}</span>
+                </div>
+                {% empty %}
+                <div class="alert alert-info">Aucune action enregistrée.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<a href="/tickets/" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Retour à la liste</a>
+{% endblock %} 

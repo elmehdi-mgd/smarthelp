@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-7 col-lg-6">
+        <div class="card p-4 shadow-lg">
+            <h2 class="mb-4 text-primary"><i class="bi bi-pencil"></i> Modifier le ticket</h2>
+            {% if form.errors %}
+                <div class="alert alert-danger">Veuillez corriger les erreurs ci-dessous.</div>
+            {% endif %}
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_titre" class="form-label">Titre</label>
+                    <input type="text" name="titre" required class="form-control" id="id_titre" value="{{ form.titre.value|default:ticket.titre }}">
+                </div>
+                <div class="mb-3">
+                    <label for="id_description" class="form-label">Description</label>
+                    <textarea name="description" required class="form-control" id="id_description" rows="4">{{ form.description.value|default:ticket.description }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="id_urgence" class="form-label">Urgence</label>
+                    {{ form.urgence }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_piece_jointe" class="form-label">Pièce jointe</label>
+                    <input type="file" name="piece_jointe" class="form-control" id="id_piece_jointe">
+                    {% if ticket.piece_jointe %}
+                    <div class="mt-2"><a href="{{ ticket.piece_jointe.url }}" target="_blank">Voir la pièce jointe actuelle</a></div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Enregistrer les modifications</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

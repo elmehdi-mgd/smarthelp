@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="py-4">
+    <div class="mb-4 text-center">
+        <h1 class="fw-bold" style="font-size:2.3rem; letter-spacing:1px;">
+            <i class="bi bi-person-circle text-info"></i> Mon Dashboard
+        </h1>
+        <p class="lead text-muted">Vue d'ensemble de vos tickets</p>
+    </div>
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary h-100 shadow-sm">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="bi bi-clipboard-data" style="font-size:2.2rem;"></i>
+                    <h4 class="mt-2">{{ tickets_ouverts }}</h4>
+                    <p class="mb-0">Tickets ouverts</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success h-100 shadow-sm">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="bi bi-check-circle" style="font-size:2.2rem;"></i>
+                    <h4 class="mt-2">{{ tickets_resolus }}</h4>
+                    <p class="mb-0">Tickets résolus</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-warning h-100 shadow-sm">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="bi bi-exclamation-triangle" style="font-size:2.2rem;"></i>
+                    <h4 class="mt-2">{{ tickets_urgents }}</h4>
+                    <p class="mb-0">Tickets urgents</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card p-3 h-100">
+                <h5 class="text-center mb-3"><i class="bi bi-pie-chart"></i> Tickets par statut</h5>
+                <canvas id="statutChart"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card p-3 h-100">
+                <h5 class="text-center mb-3"><i class="bi bi-clock-history"></i> Historique (6 mois)</h5>
+                <canvas id="historyChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const statutData = {{ statut_data|safe }};
+const historyData = {{ history_data|safe }};
+
+new Chart(document.getElementById('statutChart'), {
+    type: 'pie',
+    data: {
+        labels: statutData.labels,
+        datasets: [{ data: statutData.data, backgroundColor: statutData.colors }]
+    },
+    options: { plugins: { legend: { position: 'bottom' } } }
+});
+
+new Chart(document.getElementById('historyChart'), {
+    type: 'line',
+    data: {
+        labels: historyData.labels,
+        datasets: [{ label: 'Tickets', data: historyData.data, fill: false, borderColor: '#4f8cff', tension: 0.2 }]
+    },
+    options: { plugins: { legend: { display: false } } }
+});
+</script>
+{% endblock %} 
